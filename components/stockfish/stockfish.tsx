@@ -12,17 +12,19 @@ export interface EngineEvaluation {
 interface UseStockfishProps {
   onEvaluationUpdate: (lines: EngineEvaluation[]) => void;
   multiPVCount?: number; // How many lines to look at (e.g., 3 or 5)
+  stockfishVersion?: string;
 }
 
 export const useStockfish = ({
   onEvaluationUpdate,
   multiPVCount = 3,
+  stockfishVersion = "/stockfish-18-lite-single.js",
 }: UseStockfishProps) => {
   const workerRef = useRef<Worker | null>(null);
   const resultsAccumulator = useRef<Map<number, EngineEvaluation>>(new Map());
 
   useEffect(() => {
-    const worker = new Worker("public/stockfish-18-lite-single.js");
+    const worker = new Worker(stockfishVersion);
     workerRef.current = worker;
 
     worker.onmessage = (event: MessageEvent) => {
@@ -57,11 +59,12 @@ export const useStockfish = ({
     };
   }, [multiPVCount, onEvaluationUpdate]);
 
-  const analyzePosition = useCallback((fen: string, depth = 12) => {
+  const analyzePosition = useCallback((fen: string, time = 3000) => {
     if (!workerRef.current) return;
+    time = time < 3000 ? 3000 : time;
     resultsAccumulator.current.clear(); // Wipe previous evaluations
     workerRef.current.postMessage(`position fen ${fen}`);
-    workerRef.current.postMessage(`go depth ${depth}`);
+    workerRef.current.postMessage(`go movetime ${time}`);
   }, []);
 
   return { analyzePosition };
