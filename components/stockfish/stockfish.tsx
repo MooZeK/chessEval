@@ -57,7 +57,7 @@ export const useStockfish = ({
     return () => {
       worker.terminate();
     };
-  }, [multiPVCount, onEvaluationUpdate]);
+  }, [multiPVCount, onEvaluationUpdate, stockfishVersion]);
 
   const analyzePosition = useCallback((fen: string, time = 3000) => {
     if (!workerRef.current) return;
@@ -67,7 +67,17 @@ export const useStockfish = ({
     workerRef.current.postMessage(`go movetime ${time}`);
   }, []);
 
-  return { analyzePosition };
+  const stopAnalysis = useCallback(() => {
+    if (!workerRef.current) {
+      console.warn("Stockfish worker is not initialized.");
+      return;
+    }
+
+    // Send the standard UCI stop command
+    workerRef.current.postMessage("stop");
+  }, [workerRef]);
+
+  return { analyzePosition, stopAnalysis };
 };
 
 // Helper parser for Stockfish text output stream
