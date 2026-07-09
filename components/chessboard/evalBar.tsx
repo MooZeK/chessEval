@@ -4,7 +4,7 @@ function EvalBar(props: { percentageFill: number }) {
   const percentageFill = props.percentageFill;
   const isWhiteWinning = percentageFill > 0;
   return (
-    <div className="flex flex-col items-center w-1/16 h-[calc(100dvw/3)] justify-center overflow-hidden ">
+    <div className="flex flex-col items-center w-10 h-7/9 mr-5  justify-center overflow-hidden ">
       <div
         className={`white bg-white w-full  ${isWhiteWinning ? "text-black" : "text-white"} flex justify-center items-start`}
         style={{

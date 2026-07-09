@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { Spinner } from "../ui/spinner";
 
 // This schema validates if the string is either a FEN or a PGN
 
@@ -34,13 +35,19 @@ const SETTING_SCHEMA = z.object({
     error: "stockfish version must be of one listed",
   }),
   stockfishMaxTime: z
-    .number({error: "stockfish max time must be a number"})
-    .min(3000, {error: "Evaluation time must be at least 3000ms"}),
-    stockfishLinesNumber: z.number({error: "Number of lines must be a number"}).min(0,{error: "Number of lines must be non-negative"}),
+    .number({ error: "stockfish max time must be a number" })
+    .min(3000, { error: "Evaluation time must be at least 3000ms" }),
+  stockfishLinesNumber: z
+    .number({ error: "Number of lines must be a number" })
+    .min(0, { error: "Number of lines must be non-negative" }),
 });
 
 function SettingsDialog(props: {
-  settingsSetter: (stockfishVersion: string, stockfishMaxTime: number, stockfishLinesNumber: number) => void;
+  settingsSetter: (
+    stockfishVersion: string,
+    stockfishMaxTime: number,
+    stockfishLinesNumber: number,
+  ) => void;
 }) {
   const settingSetter = props.settingsSetter;
 
@@ -48,15 +55,19 @@ function SettingsDialog(props: {
 
   const settingsForm = useForm({
     defaultValues: {
-      stockfishVersion: CHESS_ENGINES[0],
+      stockfishVersion: CHESS_ENGINES[1],
       stockfishMaxTime: 3000,
-        stockfishLinesNumber: 3,
+      stockfishLinesNumber: 3,
     },
     validators: {
       onBlur: SETTING_SCHEMA,
     },
     onSubmit: ({ value }) => {
-      settingSetter(value.stockfishVersion, value.stockfishMaxTime,value.stockfishLinesNumber);
+      settingSetter(
+        value.stockfishVersion,
+        value.stockfishMaxTime,
+        value.stockfishLinesNumber,
+      );
       setIsOpen(false);
     },
   });
@@ -114,7 +125,7 @@ function SettingsDialog(props: {
                             placeholder={"Select stockfish version"}
                           />
                         </SelectTrigger>
-                        <SelectContent alignItemWithTrigger={false}>
+                        <SelectContent position={"popper"}>
                           <SelectGroup>
                             <SelectLabel>
                               Available stockfish versions
@@ -137,15 +148,15 @@ function SettingsDialog(props: {
               <settingsForm.Field
                 name="stockfishMaxTime"
                 validators={{
-                    onBlurAsyncDebounceMs: 500,
-                    onBlurAsync: SETTING_SCHEMA.shape.stockfishMaxTime,
+                  onBlurAsyncDebounceMs: 500,
+                  onBlurAsync: SETTING_SCHEMA.shape.stockfishMaxTime,
                 }}
                 children={(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
 
                   return (
-                    <Field >
+                    <Field>
                       <FieldLabel htmlFor={field.name}>
                         Select max time for evaluation
                       </FieldLabel>
@@ -158,7 +169,9 @@ function SettingsDialog(props: {
                         placeholder={"3000ms"}
                         value={field.state.value ?? undefined}
                         aria-invalid={isInvalid}
-                        onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+                        onChange={(e) =>
+                          field.handleChange(e.target.valueAsNumber)
+                        }
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -167,41 +180,43 @@ function SettingsDialog(props: {
                   );
                 }}
               ></settingsForm.Field>
-                <settingsForm.Field
-                    name="stockfishLinesNumber"
-                    validators={{
-                        onBlurAsyncDebounceMs: 500,
-                        onBlurAsync: SETTING_SCHEMA.shape.stockfishLinesNumber,
-                    }}
-                    children={(field)=>{
-                        const isInvalid =
-                            field.state.meta.isTouched && !field.state.meta.isValid;
+              <settingsForm.Field
+                name="stockfishLinesNumber"
+                validators={{
+                  onBlurAsyncDebounceMs: 500,
+                  onBlurAsync: SETTING_SCHEMA.shape.stockfishLinesNumber,
+                }}
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
 
-                        return (
-                            <Field >
-                                <FieldLabel htmlFor={field.name}>
-                                    Select number of evaluated lines
-                                </FieldLabel>
-                                <Input
-                                    id={field.name}
-                                    name={field.name}
-                                    onBlur={field.handleBlur}
-                                    min={0}
-                                    type={"number"}
-                                    placeholder={"number of lines"}
-                                    value={field.state.value ?? undefined}
-                                    aria-invalid={isInvalid}
-                                    onChange={(e) => field.handleChange(e.target.valueAsNumber)}
-                                />
-                                {isInvalid && (
-                                    <FieldError errors={field.state.meta.errors} />
-                                )}
-                            </Field>
-                        );
-                    }}
-                ></settingsForm.Field>
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Select number of evaluated lines
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        min={0}
+                        type={"number"}
+                        placeholder={"number of lines"}
+                        value={field.state.value ?? undefined}
+                        aria-invalid={isInvalid}
+                        onChange={(e) =>
+                          field.handleChange(e.target.valueAsNumber)
+                        }
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              ></settingsForm.Field>
               <settingsForm.Subscribe
-                selector={(state) => [state]}
+                selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
                   <ButtonGroup>
                     <ButtonGroup>
@@ -214,7 +229,14 @@ function SettingsDialog(props: {
                           settingsForm.handleSubmit();
                         }}
                       >
-                        {isSubmitting ? "..." : "Submit"}
+                        {isSubmitting ? (
+                          <span>
+                            <Spinner className={"inline"} />
+                            Submitting
+                          </span>
+                        ) : (
+                          "Submit"
+                        )}
                       </Button>
                     </ButtonGroup>
                     <ButtonGroup>

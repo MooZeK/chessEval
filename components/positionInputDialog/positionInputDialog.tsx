@@ -15,13 +15,14 @@ import { ArrowDownIcon } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { DEFAULT_POSITION } from "chess.js";
+import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 
 const FEN_PATTERN =
   /^([rnbqkpRNBQKP1-8]{1,8}\/){7}[rnbqkpRNBQKP1-8]{1,8}\s[wb]\s(-|[KkQq]{1,4})\s(-|[a-h][36])\s\d+\s\d+$/;
 
 const PGN_PATTERN =
-  /^(?:\[Event\s".+"\][\r\n]*)(?:\[Site\s".+"\][\r\n]*)(?:\[Date\s".+"\][\r\n]*)(?:\[Round\s".+"\][\r\n]*)(?:\[White\s".+"\][\r\n]*)(?:\[Black\s".+"\][\r\n]*)(?:\[Result\s".+"\][\r\n]*)(?:\[[\s\S]*?\][\r\n]*)*\s*(?:[1-9]\d*\.\s*\S+\s+(?:\S+\s+)?)+(?:1-0|0-1|1\/2-1\/2|\*)?$/;
+  /^\[Event\s".+"][\r\n]*\[Site\s".+"][\r\n]*\[Date\s".+"][\r\n]*\[Round\s".+"][\r\n]*\[White\s".+"][\r\n]*\[Black\s".+"][\r\n]*\[Result\s".+"][\r\n]*(?:\[[\s\S]*?][\r\n]*)*\s*(?:[1-9]\d*\.\s*\S+\s+(?:\S+\s+)?)+(?:1-0|0-1|1\/2-1\/2|\*)?$/;
 
 // This schema validates if the string is either a FEN or a PGN
 const chessInputSchema = z.object({
@@ -116,7 +117,7 @@ function PositionInputDialog(props: {
                 }}
               ></positionForm.Field>
               <positionForm.Subscribe
-                selector={(state) => [state]}
+                selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
                   <ButtonGroup>
                     <ButtonGroup>
@@ -129,7 +130,14 @@ function PositionInputDialog(props: {
                           positionForm.handleSubmit();
                         }}
                       >
-                        {isSubmitting ? "..." : "Submit"}
+                        {isSubmitting ? (
+                          <span>
+                            <Spinner className={"inline"} />
+                            Submitting
+                          </span>
+                        ) : (
+                          "Submit"
+                        )}
                       </Button>
                     </ButtonGroup>
                     <ButtonGroup>
