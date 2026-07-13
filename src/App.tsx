@@ -9,7 +9,7 @@ import { useChessContext } from "./ChessContext.tsx";
 
 function App() {
   // stockfish settings from formDialog
-  const { chessContextProps } = useChessContext();
+  const { chessContextProps, chessboardOptions } = useChessContext();
 
   const getTopEval = () => {
     const topMove = chessContextProps.evaluation.find(
@@ -25,7 +25,7 @@ function App() {
   return (
     <div className="App flex items-center justify-center h-screen bg-stone-800">
       <EvalBar percentageFill={getTopEval()} />
-      <Chessboard options={chessContextProps.chessboardOptions} />
+      <Chessboard options={chessboardOptions} />
       <Menu />
     </div>
   );

@@ -23,7 +23,7 @@ interface MovesData {
 
 function History(props: { moves: Move[] }) {
   const [movesData, setMovesData] = useState<MovesData[]>(() =>
-    props.moves.map((move,i) => ({
+    props.moves.map((move, i) => ({
       next: move.after,
       san: move.san,
       moveNumber: i,
@@ -31,8 +31,12 @@ function History(props: { moves: Move[] }) {
     })),
   );
 
-  const { chessContextProps, setChessContextState, setChessBoardOptionsState } =
-    useChessContext();
+  const {
+    chessContextProps,
+    chessboardOptions,
+    setChessContextState,
+    setChessBoardOptionsState,
+  } = useChessContext();
 
   const goToPosition = (fen: string) => {
     setChessContextState({
@@ -40,11 +44,11 @@ function History(props: { moves: Move[] }) {
       position: fen,
     });
     setChessBoardOptionsState({
-      ...chessContextProps.chessboardOptions,
+      ...chessboardOptions,
       position: fen,
     });
   };
-  const highlightHistoryUpToPosition = (moveIndex:number) => {
+  const highlightHistoryUpToPosition = (moveIndex: number) => {
     setMovesData(
       movesData.map((move, i) => {
         if (i < moveIndex) return move;
@@ -75,28 +79,48 @@ function History(props: { moves: Move[] }) {
 
               return (
                 <TableRow key={i + movesData[i].san}>
-                  <TableCell className={move.hasBeenPlayedYet ? "text-foreground font-medium" : "text-muted-foreground"}>{i / 2 + 1}.</TableCell>
-                  <TableCell className={move.hasBeenPlayedYet ? "text-foreground font-medium" : "text-muted-foreground"}>
+                  <TableCell
+                    className={
+                      move.hasBeenPlayedYet
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    {i / 2 + 1}.
+                  </TableCell>
+                  <TableCell
+                    className={
+                      move.hasBeenPlayedYet
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground"
+                    }
+                  >
                     {" "}
                     <Button
                       key={move.next}
                       onClick={() => {
                         goToPosition(move.next);
-                        highlightHistoryUpToPosition(move.moveNumber)
+                        highlightHistoryUpToPosition(move.moveNumber);
                       }}
                       variant={"link"}
                     >
                       {move.san}
                     </Button>
                   </TableCell>
-                  <TableCell className={nextmove.hasBeenPlayedYet ? "text-foreground font-medium" : "text-muted-foreground"}>
+                  <TableCell
+                    className={
+                      nextmove?.hasBeenPlayedYet
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground"
+                    }
+                  >
                     {" "}
                     {nextmove && (
                       <Button
                         key={nextmove.next}
                         onClick={() => {
-                          goToPosition(nextmove.next)
-                          highlightHistoryUpToPosition(nextmove.moveNumber)
+                          goToPosition(nextmove.next);
+                          highlightHistoryUpToPosition(nextmove.moveNumber);
                         }}
                         variant={"link"}
                       >
