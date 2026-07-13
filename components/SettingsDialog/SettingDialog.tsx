@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { Spinner } from "../ui/spinner";
+import { Switch } from "../ui/switch";
+import {FieldContent} from "../ui/field";
 
 // This schema validates if the string is either a FEN or a PGN
 
@@ -40,6 +42,7 @@ const SETTING_SCHEMA = z.object({
   stockfishLinesNumber: z
     .number({ error: "Number of lines must be a number" })
     .min(0, { error: "Number of lines must be non-negative" }),
+  shouldPrecalculate: z.boolean({ error: "Precalculate must be a boolean" }),
 });
 
 function SettingsDialog(props: {
@@ -47,6 +50,7 @@ function SettingsDialog(props: {
     stockfishVersion: string,
     stockfishMaxTime: number,
     stockfishLinesNumber: number,
+    shouldPrecalculate: boolean,
   ) => void;
 }) {
   const settingSetter = props.settingsSetter;
@@ -58,6 +62,7 @@ function SettingsDialog(props: {
       stockfishVersion: CHESS_ENGINES[1],
       stockfishMaxTime: 3000,
       stockfishLinesNumber: 3,
+      shouldPrecalculate: false,
     },
     validators: {
       onBlur: SETTING_SCHEMA,
@@ -67,6 +72,7 @@ function SettingsDialog(props: {
         value.stockfishVersion,
         value.stockfishMaxTime,
         value.stockfishLinesNumber,
+        value.shouldPrecalculate,
       );
       setIsOpen(false);
     },
@@ -211,6 +217,35 @@ function SettingsDialog(props: {
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
+                    </Field>
+                  );
+                }}
+              ></settingsForm.Field>
+              <settingsForm.Field
+                name="shouldPrecalculate"
+                validators={{
+                  onBlurAsyncDebounceMs: 500,
+                  onBlurAsync: SETTING_SCHEMA.shape.shouldPrecalculate,
+                }}
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+
+                  return (
+                    <Field className={"flex flex-row"}
+
+                    >
+                        <div className={"w-3/5"}>
+                        <FieldLabel>Should engine precalculate?</FieldLabel>
+                        <FieldDescription>Engine with calculate best lines and win percentages for whole game history on load. This may take some time</FieldDescription>
+                        {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                        )}
+                        </div>
+                            <Switch ></Switch>
+
+
+
                     </Field>
                   );
                 }}

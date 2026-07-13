@@ -5,22 +5,22 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Progress } from "../ui/progress";
-import { ButtonGroup } from "../ui/button-group";
-import { PositionInputDialog } from "../positionInputDialog/positionInputDialog";
-import { SettingsDialog } from "../SettingsDialog/SettingDialog";
-import { Separator } from "../ui/separator";
-import Lines from "../Lines/Lines";
-import History from "../History/History";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { useChessContext } from "../../src/ChessContext.tsx";
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { PositionInputDialog } from "@/components/positionInputDialog/positionInputDialog";
+import { SettingsDialog } from "@/components/SettingsDialog/SettingDialog";
+import { Separator } from "@/components/ui/separator";
+import Lines from "@/components/Lines/Lines";
+import History from "@/components/History/History";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useChessContext } from "@/src/ChessContext.tsx";
 import { Chess } from "chess.js";
 import { z } from "zod";
 import {
   FEN_PATTERN,
   PGN_PATTERN,
-} from "../positionInputDialog/positionInputDialog.tsx";
+} from "@/components/positionInputDialog/positionInputDialog.tsx";
 
 function Menu() {
   const { chessContextProps, setChessState, setChessContextState } =
